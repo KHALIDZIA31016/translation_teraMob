@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../catagory_screen.dart';
 import '../../controller/category_contrl.dart';
 import '../../translator/controller/translate_contrl.dart';
+import '../../utils/app_images.dart';
 import '../../view/see_diff/controller_sel.dart';
 import '../../view/see_diff/model_sel.dart';
 import '../../widgets/back_button.dart';
@@ -268,26 +269,26 @@ class _PhrasesScreenState extends State<PhrasesScreen> {
   TextEditingController _shareController = TextEditingController();
 
   final List<String> leadingIcons = [
-    AppIcons.greetingIcon,
-    AppIcons.sayingIcon,
-    AppIcons.number9Icon,
-    AppIcons.timeIcon,
-    AppIcons.directionsIcon,
-    AppIcons.transportIcon,
-    AppIcons.accommodationIcon,
-    AppIcons.eatOutIcon,
-    AppIcons.shoppingIcon,
-    AppIcons.colorIcon,
-    AppIcons.townIcon,
-    AppIcons.countryIcon,
-    AppIcons.touristIcon,
-    AppIcons.familyIcon,
-    AppIcons.datingIcon,
-    AppIcons.emergencyIcon,
-    AppIcons.sickIcon,
-    AppIcons.twisterIcon,
-    AppIcons.occasionIcon,
-    AppIcons.bodyPart,
+    AppImages.greetingsIcon,
+    AppImages.conversationIcon,
+    AppImages.numbersIcon,
+    AppImages.dateTimeIcon,
+    AppImages.directionIcon,
+    AppImages.transportIcon,
+    AppImages.accomodationIcon,
+    AppImages.eatingIcon,
+    AppImages.shoppingIcon,
+    AppImages.colorsIcon,
+    AppImages.townIcon,
+    AppImages.countryIcon,
+    AppImages.touristIcon,
+    AppImages.familyIcon,
+    AppImages.datingIcon,
+    AppImages.emergencyIcon,
+    AppImages.sickIcon,
+    AppImages.twistorsIcon,
+    AppImages.occasionsIcon,
+    AppImages.bodyPartsIcon,
   ];
 
   String _getTranslation(BtmModel model, String language) {
@@ -678,6 +679,7 @@ class _PhrasesScreenState extends State<PhrasesScreen> {
               ),
             ],
           ),
+          20.asHeightBox,
           _isLoading
               ? Expanded(
                 child: Center(child: CircularProgressIndicator()),
@@ -696,14 +698,22 @@ class _PhrasesScreenState extends State<PhrasesScreen> {
                 itemBuilder: (context, index) {
                   final model = btmController.categor[index];
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: Container(
                       height: 70,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Color(0XFF4169E1).withValues(alpha: .46),),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade400,
+                            offset: Offset(0.2, 1.8),
+                            blurRadius: 0.2,
+                            // spreadRadius: .2,
+                          )
+                        ]
+                        // border: Border.all(color: Colors.grey.shade300),
                       ),
                       child: InkWell(
                         onTap: () {
@@ -729,26 +739,19 @@ class _PhrasesScreenState extends State<PhrasesScreen> {
                           // contentPadding: EdgeInsets.zero,
                           title: Text(
                             _getTranslation(model, firstContainerLanguage), // Get the translated text
-                            textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(firstContainerLanguage))
-                                ? TextDirection.rtl
-                                : TextDirection.ltr,
+                            // textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(firstContainerLanguage))
+                            //     ? TextDirection.rtl
+                            //     : TextDirection.ltr,
                           ),
                           subtitle: Text(
                             _getTranslation(model, secondContainerLanguage), // Get the translated text
-                            textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"]
-                                .contains(secondContainerLanguage))
-                                ? TextDirection.rtl
-                                : TextDirection.ltr,
+                            // textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"]
+                            //     .contains(secondContainerLanguage))
+                            //     ? TextDirection.rtl
+                            //     : TextDirection.ltr,
+                            style: TextStyle(color: Color(0XFF4169E1).withValues(alpha: .9)),
                           ),
-                          leading: Container(
-                            height: 30,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Color(0XFF4169E1).withValues(alpha: .46),),
-                              color: Color(0XFFE8E8E8),
-                            ),
-                            child: Image.asset(leadingIcons[index], scale: 28),
-                          ),
+                          leading: Image.asset(leadingIcons[index], scale: 16),
                         ),
                       ),
                     ),

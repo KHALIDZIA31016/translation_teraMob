@@ -31,22 +31,21 @@ class _SpellPronounceState extends State<SpellPronounce> {
 
   final List<String> title = [
     'Spell Checker',
-    'Translator',
+    'Translation',
     'Dictionary',
     'Phrases',
-    'Test Trans'
+    'Translator',
   ];
 
   final List<Widget> screens = [
     CheckSpellScreen(),
-    TranslationScreen(),
-    // TranslateScreen(),
+    InputScreen(),
     DictionaryHomePage(),
     PhrasesScreen(),
-    InputScreen(),
+    TranslationScreen(),
   ];
 
-  final List<double> iconSize = [14.3, 14.2, 14.2, 14.7, 14.7];
+  final List<double> iconSize = [14, 14.2, 14.2, 14.7, 14.7, 14.7];
 
   final List<String> icons = [
     AppIcons.spelIcon1,

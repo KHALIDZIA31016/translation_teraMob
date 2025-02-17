@@ -142,6 +142,7 @@ class _PronunciationScreenState extends State<PronunciationScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
                   child: TextFormField(
+                    maxLines: null,
                     controller: _textController,
                     decoration: InputDecoration(
                       hintText: 'Type here',
@@ -155,7 +156,7 @@ class _PronunciationScreenState extends State<PronunciationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: screenWidth * 0.003,
                   children: [
-                    CustomMic2(textController: _textController,),
+                    CMic2(textController: _textController,),
                     7.asWidthBox,
                     CustomTextBtn(
                       height: screenHeight * 0.06,
@@ -178,93 +179,64 @@ class _PronunciationScreenState extends State<PronunciationScreen> {
       ),
     );
   }
-}
-
-
-
-
-
-
-
-
-
-
-
-class CustomMic2 extends StatefulWidget {
-  final TextEditingController textController;
-  const CustomMic2({super.key, required this.textController});
-
-  @override
-  State<CustomMic2> createState() => _CustomMic2State();
-}
-
-class _CustomMic2State extends State<CustomMic2> {
-  late stt.SpeechToText _speech;
-  bool _isListening = false;
-  bool _isCooldown = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _speech = stt.SpeechToText();
-    _initializeSpeech();
-  }
-
-  Future<void> _initializeSpeech() async {
-    bool available = await _speech.initialize(
-      onStatus: (status) {
-        print("Speech Status: $status");
-      },
-      onError: (error) {
-        print("Speech Error: $error");
-      },
-    );
-    if (!available) {
-      Get.snackbar("Error", "Speech recognition is not available.");
-    }
-  }
-
-  Future<bool> isInternetAvailable() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult != ConnectivityResult.none;
-  }
-
-  Future<void> _startListening() async {
-    if (_isCooldown || _isListening) return;
-
-    final internetAvailable = await isInternetAvailable();
-    if (!internetAvailable) {
-      Fluttertoast.showToast(
-        msg: "Internet is weak or not available. Please check your connection.",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-      return;
-    }
-
+  RxBool isListening = false.obs;
+  static const MethodChannel _methodChannel =
+  MethodChannel('com.example.mnh/speech_Text');
+  // Future<void> handleUserActionTranslate(String text) async {
+    // await translate(text); // Proceed with translation once the ad is closed
+    // await speakText(); // Automatically speak after translation
+  // }
+  TextEditingController controller = TextEditingController();
+  Future<void> startSpeechToText(String languageISO) async {
     try {
-      setState(() {
-        _isListening = true;
-        _isCooldown = true;
-      });
+      isListening.value = true;
+      final result = await _methodChannel.invokeMethod('getTextFromSpeech', {'languageISO': languageISO});
 
-      await _speech.listen(
-        onResult: (result) {
-          setState(() {
-            widget.textController.text = result.recognizedWords;
-          });
-        },
-        listenFor: const Duration(seconds: 10),
-        cancelOnError: true,
+      if (result != null && result.isNotEmpty) {
+        controller.text = result;
+        // await handleUserActionTranslate(result);
+      }
+    } on PlatformException catch (e) {
+      print("Speech-to-text error: ${e.toString()}");
+    }
+  }
+}
+
+class CMic2 extends StatefulWidget {
+  final TextEditingController textController;
+  final Function? onTextUpdated;
+  const CMic2({super.key, required this.textController, this.onTextUpdated});
+
+  @override
+  State<CMic2> createState() => _CMic2State();
+}
+
+class _CMic2State extends State<CMic2> {
+  late stt.SpeechToText _speech;
+  RxBool isListening = false.obs;
+  static const MethodChannel _methodChannel =
+  MethodChannel('com.example.mnh/speech_Text');
+
+  Future<void> startSpeechToText(String languageISO) async {
+    try {
+      isListening.value = true;
+      final result = await _methodChannel.invokeMethod(
+        'getTextFromSpeech',
+        {'languageISO': languageISO},
       );
-    } catch (e) {
-      Get.snackbar('Error', 'Speech-to-text failed. Try again.');
-    } finally {
-      await Future.delayed(const Duration(seconds: 1));
-      setState(() {
-        _isListening = false;
-        _isCooldown = false;
-      });
+
+      if (result != null && result.isNotEmpty) {
+        widget.textController.text = result;
+      }
+      await _speech.listen(
+          onResult: (result) {
+            setState(() {
+              widget.textController.text = result.recognizedWords;
+              widget.onTextUpdated!(); // Notify that text has been updated
+            });
+          });
+    } on PlatformException catch (e) {
+      print("Speech-to-text error: ${e.toString()}");
     }
   }
 
@@ -273,7 +245,7 @@ class _CustomMic2State extends State<CustomMic2> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return GestureDetector(
-      onTap: _startListening,
+      onTap: () => startSpeechToText('en-US'),
       child: Container(
         height: screenHeight * 0.06,
         width: screenWidth * 0.14,

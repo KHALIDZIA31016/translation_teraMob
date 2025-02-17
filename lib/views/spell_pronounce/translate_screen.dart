@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -27,12 +28,14 @@ class TranslationScreen extends StatefulWidget {
 class _TranslationScreenState extends State<TranslationScreen> {
   final MyTranslationController translationController = Get.put(MyTranslationController());
   final ScrollController _scrollController = ScrollController();
+  final FlutterTts flutterTts=FlutterTts();
 
   DateTime? lastTapTime;
   bool _isCooldown = false;
   bool _isTtsInProgress = false;
   bool _isTranslate = false;
   bool showTranslationContainer = false;
+  bool _isActive = false;
   @override
 
   Future<bool> isInternetAvailable() async {
@@ -70,6 +73,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
       setState(() => _isCooldown = false);
     }
   }
+
+
   Future<void> speakText() async {
     if (_isTtsInProgress) {
       Fluttertoast.showToast(
@@ -81,14 +86,27 @@ class _TranslationScreenState extends State<TranslationScreen> {
     }
 
     try {
-      setState(() => _isTtsInProgress = true);
+      if (mounted) setState(() => _isTtsInProgress = true);
       await translationController.speakText();
     } catch (e) {
-      Get.snackbar('Error', 'TTS failed. Try again.');
+      if (mounted) {
+        Get.snackbar('Error', 'TTS failed. Try again.');
+      }
     } finally {
-      setState(() => _isTtsInProgress = false);
+      if (mounted) setState(() => _isTtsInProgress = false);
+    }
+
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      // **Stop TTS when app goes to background or inactive**
+      flutterTts.stop();
+      _isTtsInProgress == false;
     }
   }
+
 
   void onLanguageSelected(String language) {
     if (language == 'English') {
@@ -198,8 +216,9 @@ class _TranslationScreenState extends State<TranslationScreen> {
               btnColor: Colors.white,
               icon: Icons.arrow_back_ios,
               iconSize: screenWidth * 0.05,
-              onPressed: () {
-                Navigator.pop(context);
+              onPressed: () {     flutterTts.stop();
+
+              Navigator.pop(context);
               },
             ),
             centerTitle: true,
@@ -373,7 +392,9 @@ class _TranslationScreenState extends State<TranslationScreen> {
                                 ),
                                 textTitle: 'Translate',
                                 onTap: () async{
+
                                   try {
+
                                     final th = translationController.translate(
                                         translationController.controller.text);
                                     // await translationController.translatedText('$th');
@@ -387,6 +408,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                                   } catch (e) {
                                     print("######### $e");
                                   }
+
 
                                   // Open mic for speech-to-text but keep the input container visible
 
@@ -415,7 +437,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                             // First Container (Original Text)
                             Container(
                               // margin: EdgeInsets.symmetric(horizontal: 8),
-                              height: screenHeight * 0.16,
+                              // height: screenHeight * 0.16,
                               width: screenWidth * 0.78,
                               decoration: BoxDecoration(
                                 color: Color(0XFFFFFFF9),
@@ -444,7 +466,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
                                         icon: Icon(Icons.close, color: Colors.red, size: 22,),
                                         onPressed: () {
                                           setState(() {
-                                            _isTranslate = true; // Switch back to input container
+                                            flutterTts.stop();
+                                          _isTranslate = true; // Switch back to input container
                                             translationController.controller.clear(); // Optional: Clear text
                                             translationController.translatedText.value = ''; // Reset translated text
                                           });
@@ -467,8 +490,6 @@ class _TranslationScreenState extends State<TranslationScreen> {
                                       ),
                                     ),
                                   ),
-
-
                                 ],
                               ),
                             ),
@@ -476,7 +497,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                             // Second Container (Translated Text)
                             Container(
                               // margin: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              height: screenHeight * 0.18,
+                              // height: screenHeight * 0.18,
                               width: screenWidth * 0.78,
                               decoration: BoxDecoration(
                                 color: Color(0XFFAFAFAF),
@@ -529,18 +550,27 @@ class _TranslationScreenState extends State<TranslationScreen> {
                                               color: Color(0XFF6082B6),
                                               size: 18,
                                             ),
-                                            onPressed: speakText,
+                                            onPressed: (){
+                                              speakText();
+                                              flutterTts.stop();
+                                              // setState(() {
+                                              //   _isTtsInProgress = false;
+                                              // });
+                                            },
                                             tooltip: "Speak text",
                                           ),
                                         ),
                                       ),
+
+
                                     ],
                                   ),
-
+                                  16.asHeightBox,
 
                                 ],
                               ),
                             ),
+
                           ],
                         ),
                       ),
@@ -550,7 +580,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
                   }
                 }),
 
-              ],
+
+    ],
             ),
           ),
         )

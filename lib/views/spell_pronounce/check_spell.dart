@@ -1,13 +1,19 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:fluttertoast/fluttertoast.dart'; // For Toast messages
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:languagetool_textfield/languagetool_textfield.dart';
 import 'package:mnh/utils/app_images.dart';
+import 'package:mnh/views/spell_pronounce/pronunciation_screen.dart';
 import 'package:mnh/widgets/extensions/empty_space.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
+import '../../translator/controller/translate_contrl.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_icons.dart';
 import '../../widgets/back_button.dart';
@@ -274,7 +280,9 @@ class _CheckSpellScreenState extends State<CheckSpellScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     spacing: screenWidth * 0.003,
                     children: [
-                      CustomMic2(textController: _textController,),
+                      // CustomMic2(textController: _textController,),
+                      // CuMic2(textController: _textController,),
+                      CMic2(textController: _controller,),
                       7.asWidthBox,
                       _isLoading
                           ? const CircularProgressIndicator()
@@ -425,3 +433,114 @@ class LanguageContainer extends StatelessWidget {
 //     color: copyColor,
 //   ),
 // ),
+
+
+
+
+
+
+class CuMic2 extends StatefulWidget {
+  final TextEditingController textController;
+  const CuMic2({super.key, required this.textController});
+
+  @override
+  State<CuMic2> createState() => _CuMic2State();
+}
+
+class _CuMic2State extends State<CuMic2> {
+  // final MyTranslationController translationController = Get.put(MyTranslationController());
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  bool _isCooldown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+    _initializeSpeech();
+  }
+
+  Future<void> _initializeSpeech() async {
+    bool available = await _speech.initialize(
+      onStatus: (status) {
+        print("Speech Status: $status");
+      },
+      onError: (error) {
+        print("Speech Error: $error");
+      },
+    );
+    if (!available) {
+      Get.snackbar("Error", "Speech recognition is not available.");
+    }
+  }
+
+  Future<bool> isInternetAvailable() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
+  }
+
+  Future<void> _startListening(String languageCode) async {
+    if (_isCooldown || _isListening) return;
+
+    final internetAvailable = await isInternetAvailable();
+    if (!internetAvailable) {
+      Fluttertoast.showToast(
+        msg: "Internet is weak or not available. Please check your connection.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    setState(() {
+      _isListening = true;
+      _isCooldown = true;
+    });
+
+    try {
+      // await translationController.startSpeechToText(languageCode);
+
+      await _speech.listen(
+        onResult: (result) {
+          setState(() {
+            widget.textController.text = result.recognizedWords;
+          });
+        },
+        listenFor: const Duration(seconds: 10),
+        cancelOnError: true,
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'Speech-to-text failed. Try again.');
+    } finally {
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        _isListening = false;
+        _isCooldown = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return GestureDetector(
+      onTap: () {
+        _startListening('en-US');
+      },
+      child: Container(
+        height: screenHeight * 0.06,
+        width: screenWidth * 0.14,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(12),
+            bottomLeft: Radius.circular(12),
+          ),
+          color: const Color(0XFF4169E1).withOpacity(0.76),
+        ),
+        child: Image.asset(AppIcons.micIcon, color: Colors.white, scale: 23),
+      ),
+    );
+  }
+}

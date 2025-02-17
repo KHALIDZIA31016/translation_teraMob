@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:mnh/testScreen.dart';
 import 'package:mnh/utils/app_icons.dart';
+import 'package:mnh/views/spell_pronounce/pronunciation_screen.dart';
 import 'package:mnh/views/spell_pronounce/services_dict/dict_model.dart';
 import 'package:mnh/views/spell_pronounce/services_dict/services.dart';
 import 'package:mnh/widgets/copy_btn.dart';
@@ -16,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../translator/controller/translate_contrl.dart';
 import '../../widgets/back_button.dart';
+import '../../widgets/custom_mic.dart';
 
 class DictionaryHomePage extends StatefulWidget {
   const DictionaryHomePage({super.key});
@@ -165,6 +167,10 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                 hintText: "Search the word here",
                 prefixIcon: _isTextAvailable ? null : Icon(Icons.search, color: Color(0XFF4169E1)),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                // suffixIcon: CMic2(
+                //   textController: searchController,
+                //
+                // )
                 suffixIcon: micSpeak(
                   textController: searchController,
                   onTextUpdated: () {
@@ -350,12 +356,12 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                   spacing: 18,
                   children: [
                     CopyBtnDic(
-                        iconColor: Colors.black,
+                        iconColor: Colors.blueGrey,
                         contentToCopy: meaning.definitions.map((definition)
                                         => definition.definition).join("\n\n")),
-                    VolumeBtnDic(iconColor: Colors.red, textToSpeak: meaning.definitions.map((definition)
+                    VolumeBtnDic(iconColor: Colors.blueGrey, textToSpeak: meaning.definitions.map((definition)
                     => definition.definition).join("\n\n")),
-                    ShareBtnDic(iconColor: Colors.green, textToShare:meaning.definitions.map((definition)
+                    ShareBtnDic(iconColor: Colors.blueGrey, textToShare:meaning.definitions.map((definition)
                     => definition.definition).join("\n\n")),
                   ],
                 )
@@ -420,9 +426,9 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
              mainAxisAlignment: MainAxisAlignment.spaceBetween,
              spacing: 18,
               children: [
-                CopyBtnDic(iconColor: Colors.black, contentToCopy: setList.toSet().join(", "),),
-                VolumeBtnDic(iconColor: Colors.red, textToSpeak: setList.toSet().join(", ")),
-                ShareBtnDic(iconColor: Colors.green, textToShare: setList.toSet().join(", ")),
+                CopyBtnDic(iconColor: Colors.blueGrey, contentToCopy: setList.toSet().join(", "),),
+                VolumeBtnDic(iconColor: Colors.blueGrey, textToSpeak: setList.toSet().join(", ")),
+                ShareBtnDic(iconColor: Colors.blueGrey, textToShare: setList.toSet().join(", ")),
               ],
             ),
 
@@ -435,7 +441,6 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
     }
   }
 }
-
 class micSpeak extends StatefulWidget {
   final TextEditingController textController;
   final Function onTextUpdated;
@@ -449,6 +454,8 @@ class _micSpeakState extends State<micSpeak> {
   late stt.SpeechToText _speech;
   bool _isListening = false;
   bool _isCooldown = false;
+  static const MethodChannel _methodChannel =
+  MethodChannel('com.example.mnh/speech_Text');
 
   @override
   void initState() {
@@ -476,7 +483,7 @@ class _micSpeakState extends State<micSpeak> {
     return connectivityResult != ConnectivityResult.none;
   }
 
-  Future<void> _startListening() async {
+  Future<void> startSpeechToText(String languageISO) async {
     if (_isCooldown || _isListening) return;
 
     final internetAvailable = await isInternetAvailable();
@@ -495,11 +502,21 @@ class _micSpeakState extends State<micSpeak> {
         _isCooldown = true;
       });
 
+      final result = await _methodChannel.invokeMethod(
+        'getTextFromSpeech',
+        {'languageISO': languageISO},
+      );
+
+      if (result != null && result.isNotEmpty) {
+        widget.textController.text = result;
+        widget.onTextUpdated();
+      }
+
       await _speech.listen(
-        onResult: (result) {
+        onResult: (speechResult) {
           setState(() {
-            widget.textController.text = result.recognizedWords;
-            widget.onTextUpdated(); // Notify that text has been updated
+            widget.textController.text = speechResult.recognizedWords;
+            widget.onTextUpdated();
           });
         },
         listenFor: const Duration(seconds: 10),
@@ -518,16 +535,9 @@ class _micSpeakState extends State<micSpeak> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return GestureDetector(
-      onTap: () {
-        _startListening();
-      },
-      child: Image.asset(
-          AppIcons.micIcon,
-          color: Color(0XFF4169E1).withValues(alpha: .76),
-          scale: 28),
+      onTap: () => startSpeechToText('en-US'),
+      child: Image.asset(AppIcons.micIcon, color: Colors.blue, scale: 23),
     );
   }
 }
@@ -589,7 +599,7 @@ class _VolumeBtnDicState extends State<VolumeBtnDic> {
       icon: Icon(Icons.volume_up, color: widget.iconColor, size: 20),
       onPressed: () {
         _speak();
-        Fluttertoast.showToast(msg: 'Listen carefully');
+        // Fluttertoast.showToast(msg: 'Listen carefully');
       },
     );
   }
@@ -610,7 +620,7 @@ class ShareBtnDic extends StatelessWidget {
       onPressed: () {
         if (textToShare.trim().isNotEmpty) {
           Share.share(textToShare);
-          Fluttertoast.showToast(msg: 'share the text');
+          // Fluttertoast.showToast(msg: 'share the text');
         } else {
           Fluttertoast.showToast(msg: 'No text to share');
         }

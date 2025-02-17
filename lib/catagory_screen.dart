@@ -35,10 +35,15 @@ class PhrasesCategoryScreen extends StatefulWidget {
 }
 
 class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
-  final MyTranslationController translationController = Get.put(MyTranslationController());
+  final MyTranslationController translationController =
+      Get.put(MyTranslationController());
   final List<String> langList = ["Arabic", "Urdu", "Hebrew", "Persian"];
   final FlutterTts _flutterTts = FlutterTts();
   String _selectedValue = 'English'; // Default language
+
+
+  String firstContainerLanguage = "English";
+  String secondContainerLanguage = "Urdu";
 
   // Supported languages
   final Map<String, String> _languageCodes = {
@@ -158,19 +163,22 @@ class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
           await _flutterTts.setLanguage(languageCode);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Language not supported on this device. Using default language.")),
+            SnackBar(
+                content: Text(
+                    "Language not supported on this device. Using default language.")),
           );
           languageCode = 'en-US'; // Fallback to English
           await _flutterTts.setLanguage(languageCode);
         }
 
         // Adjust speech rate and pitch for single-word clarity
-        await _flutterTts.setPitch(1.0); // Neutral pitch
-        await _flutterTts.setSpeechRate(0.4); // Slower speech rate
+        await _flutterTts.setPitch(0.7); // Neutral pitch
+        await _flutterTts.setSpeechRate(1); // Slower speech rate
 
         // Handle single word cases, adding a space after the word for Urdu
-        if (_selectedValue == 'Urdu' && textVol.split(' ').length == 1) {
-          textVol += " "; // Add a space to the single word to improve recognition
+        if (_selectedValue == 'Urdu' && textVol.split(' ').length <= 1) {
+          textVol +=
+              " "; // Add a space to the single word to improve recognition
         }
 
         // Speak the text
@@ -187,6 +195,111 @@ class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
       );
     }
   }
+  final Map<String, Map<String, String>> languageCountryCode = {
+    "English": {"code": "US", "country": "United States"},
+    "Afrikaans": {"code": "ZA", "country": "South Africa"},
+    "Albanian": {"code": "AL", "country": "Albania"},
+    "Amharic": {"code": "ET", "country": "Ethiopia"},
+    "Arabic": {"code": "SA", "country": "Saudi Arabia"},
+    "Armenian": {"code": "AM", "country": "Armenia"},
+    "Azerbaijani": {"code": "AZ", "country": "Azerbaijan"},
+    "Basque": {"code": "ES", "country": "Spain"},
+    "Belarusian": {"code": "BY", "country": "Belarus"},
+    "Bengali": {"code": "BD", "country": "Bangladesh"},
+    "Bosnian": {"code": "BA", "country": "Bosnia and Herzegovina"},
+    "Bulgarian": {"code": "BG", "country": "Bulgaria"},
+    "Catalan": {"code": "ES", "country": "Spain"},
+    "Cebuano": {"code": "PH", "country": "Philippines"},
+    "ChineseSimplified": {"code": "CN", "country": "China"},
+    "ChineseTraditional": {"code": "TW", "country": "Taiwan"},
+    "Croatian": {"code": "HR", "country": "Croatia"},
+    "Czech": {"code": "CZ", "country": "Czech Republic"},
+    "Danish": {"code": "DK", "country": "Denmark"},
+    "Dutch": {"code": "NL", "country": "Netherlands"},
+    "Esperanto": {"code": "ZZ", "country": "Esperanto"},
+    "Estonian": {"code": "EE", "country": "Estonia"},
+    "Finnish": {"code": "FI", "country": "Finland"},
+    "French": {"code": "FR", "country": "France"},
+    "Frisian": {"code": "NL", "country": "Netherlands"},
+    "Galician": {"code": "ES", "country": "Spain"},
+    "Georgian": {"code": "GE", "country": "Georgia"},
+    "German": {"code": "DE", "country": "Germany"},
+    "Greek": {"code": "GR", "country": "Greece"},
+    "Gujarati": {"code": "IN", "country": "India"},
+    "Haitian": {"code": "HT", "country": "Haiti"},
+    "Hausa": {"code": "NG", "country": "Nigeria"},
+    "Hawaiian": {"code": "US", "country": "United States"},
+    "Hebrew": {"code": "IL", "country": "Israel"},
+    "Hindi": {"code": "IN", "country": "India"},
+    "Hmong": {"code": "LA", "country": "Laos"},
+    "Hungarian": {"code": "HU", "country": "Hungary"},
+    "Icelandic": {"code": "IS", "country": "Iceland"},
+    "Indonesian": {"code": "ID", "country": "Indonesia"},
+    "Irish": {"code": "IE", "country": "Ireland"},
+    "Italian": {"code": "IT", "country": "Italy"},
+    "Japanese": {"code": "JP", "country": "Japan"},
+    "Javanese": {"code": "ID", "country": "Indonesia"},
+    "Kannada": {"code": "IN", "country": "India"},
+    "Kazakh": {"code": "KZ", "country": "Kazakhstan"},
+    "Khmer": {"code": "KH", "country": "Cambodia"},
+    "KoreanNK": {"code": "KP", "country": "North Korea"},
+    "KoreanSK": {"code": "KR", "country": "South Korea"},
+    "Kurdish": {"code": "IQ", "country": "Iraq"},
+    "Kyrgyz": {"code": "KG", "country": "Kyrgyzstan"},
+    "Lao": {"code": "LA", "country": "Laos"},
+    "Latin": {"code": "ZZ", "country": "Latin"},
+    "Latvian": {"code": "LV", "country": "Latvia"},
+    "Lithuanian": {"code": "LT", "country": "Lithuania"},
+    "Luxembourgish": {"code": "LU", "country": "Luxembourg"},
+    "Macedonian": {"code": "MK", "country": "North Macedonia"},
+    "Malagasy": {"code": "MG", "country": "Madagascar"},
+    "Malay": {"code": "MY", "country": "Malaysia"},
+    "Malayalam": {"code": "IN", "country": "India"},
+    "Maltese": {"code": "MT", "country": "Malta"},
+    "Maori": {"code": "NZ", "country": "New Zealand"},
+    "Marathi": {"code": "IN", "country": "India"},
+    "Mongolian": {"code": "MN", "country": "Mongolia"},
+    "MyanmarBurmese": {"code": "MM", "country": "Myanmar"},
+    "Nepali": {"code": "NP", "country": "Nepal"},
+    "Norwegian": {"code": "NO", "country": "Norway"},
+    "NyanjaChichewa": {"code": "MW", "country": "Malawi"},
+    "Pashto": {"code": "AF", "country": "Afghanistan"},
+    "Persian": {"code": "IR", "country": "Iran"},
+    "Polish": {"code": "PL", "country": "Poland"},
+    "Portuguese": {"code": "PT", "country": "Portugal"},
+    "Punjabi": {"code": "IN", "country": "India"},
+    "Romanian": {"code": "RO", "country": "Romania"},
+    "Russian": {"code": "RU", "country": "Russia"},
+    "Samoan": {"code": "WS", "country": "Samoa"},
+    "ScotsGaelic": {"code": "GB", "country": "United Kingdom"},
+    "Serbian": {"code": "RS", "country": "Serbia"},
+    "Sesotho": {"code": "LS", "country": "Lesotho"},
+    "Shona": {"code": "ZW", "country": "Zimbabwe"},
+    "Sindhi": {"code": "PK", "country": "Pakistan"},
+    "Sinhala": {"code": "LK", "country": "Sri Lanka"},
+    "Slovak": {"code": "SK", "country": "Slovakia"},
+    "Slovenian": {"code": "SI", "country": "Slovenia"},
+    "Somali": {"code": "SO", "country": "Somalia"},
+    "Spanish": {"code": "ES", "country": "Spain"},
+    "Sundanese": {"code": "ID", "country": "Indonesia"},
+    "Swahili": {"code": "KE", "country": "Kenya"},
+    "Swedish": {"code": "SE", "country": "Sweden"},
+    "Tagalog": {"code": "PH", "country": "Philippines"},
+    "Tajik": {"code": "TJ", "country": "Tajikistan"},
+    "Tamil": {"code": "IN", "country": "India"},
+    "Telugu": {"code": "IN", "country": "India"},
+    "Thai": {"code": "TH", "country": "Thailand"},
+    "Turkish": {"code": "TR", "country": "Turkey"},
+    "Ukrainian": {"code": "UA", "country": "Ukraine"},
+    "Urdu": {"code": "PK", "country": "Pakistan"},
+    "Uzbek": {"code": "UZ", "country": "Uzbekistan"},
+    "Vietnamese": {"code": "VN", "country": "Vietnam"},
+    "Welsh": {"code": "GB", "country": "United Kingdom"},
+    "Xhosa": {"code": "ZA", "country": "South Africa"},
+    "Yiddish": {"code": "ZZ", "country": "Yiddish"},
+    "Yoruba": {"code": "NG", "country": "Nigeria"},
+    "Zulu": {"code": "ZA", "country": "South Africa"},
+  };
 
 
   @override
@@ -197,9 +310,10 @@ class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
 
   final categoryController controller = Get.put(categoryController());
 
-
   String _getTranslation(PhrasesModel model, String titleLang) {
     switch (titleLang) {
+      case "English":
+        return model.english;
       case "Afrikaans":
         return model.afrikaans;
       case "Albanian":
@@ -407,11 +521,11 @@ class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
       default:
         return model.english;
     }
-
   }
 
   // To track the active icons individually for each item (copy, share, volume)
-  Map<int, String> activeIcons = {}; // Key is index, value is the icon type ("copy", "share", "volume")
+  Map<int, String> activeIcons =
+      {}; // Key is index, value is the icon type ("copy", "share", "volume")
 
   void _handleIconClick(int index, String text, String iconType) {
     setState(() {
@@ -430,7 +544,7 @@ class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
       // Copy the text to clipboard
       final textToCopy = text;
       Clipboard.setData(ClipboardData(text: textToCopy)).then(
-            (_) {
+        (_) {
           Fluttertoast.showToast(msg: 'Text Copied to Clipboard');
         },
       );
@@ -456,7 +570,7 @@ class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Color(0XFFF0F0F0),
+      backgroundColor: Color(0XFFE0E0E0),
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
@@ -482,139 +596,469 @@ class _PhrasesCategoryScreenState extends State<PhrasesCategoryScreen> {
             .toList();
 
         return ListView.builder(
-          itemCount: filterPhraseID.length,
-          itemBuilder: (context, index) {
-            final item = filterPhraseID[index];
-            final isActiveCopy   = activeIcons[index] == "copy";
-            final isActiveShare  = activeIcons[index] == "share";
-            final isActiveVolume = activeIcons[index] == "volume";
-            return Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.04,
-                vertical: screenHeight * 0.01,
-              ),
-              margin: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.02,
-                vertical: screenHeight * 0.01,
-              ),
-              width: screenWidth * 0.9,
-              height: screenHeight * 0.17,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(screenWidth * 0.066),
-                // border: Border(
-                //     // bottom: BorderSide(color: Color(0XFF22223B).withValues(alpha: .2), width: 2),
-                //     top: BorderSide(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2),
-                //     left: BorderSide(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2),
-                //     right: BorderSide(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2),
-                // ),
-                // color: Color(0XFF4169E1).withValues(alpha: .03),
-                border: Border.all(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2)
-
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Flexible(
+            itemCount: filterPhraseID.length,
+            itemBuilder: (context, index) {
+          final item = filterPhraseID[index];
+          final isActiveCopy = activeIcons[index] == "copy";
+          final isActiveShare = activeIcons[index] == "share";
+          final isActiveVolume = activeIcons[index] == "volume";
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                      height: 100,
+                      width: 300,
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade400,
+                              offset: Offset(0.2, 1.8),
+                              blurRadius: 0.2,
+                              // spreadRadius: .2,
+                            )
+                          ]
+                      ),
+                      // child: Column(
+                      //   crossAxisAlignment: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.subtitleLang))
+                      //       ? CrossAxisAlignment.start
+                      //       :  CrossAxisAlignment.end,
+                      //   children: [
+                      //     Row(
+                      //      children: [
+                      //        GestureDetector(
+                      //          onTap: () => {
+                      //
+                      //          },
+                      //          child: LanguageContainer(
+                      //            language:firstContainerLanguage,
+                      //            countryCode: languageCountryCode[firstContainerLanguage]!['code']!,
+                      //          ),
+                      //        ),
+                      //      ],
+                      //     ),
+                      //     Text(
+                      //       _getTranslation(item,
+                      //           widget.titleLang),
+                      //       textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(  widget.titleLang))
+                      //           ? TextDirection.rtl
+                      //           : TextDirection.ltr,
+                      //       softWrap: true,
+                      //       maxLines: 4,
+                      //       locale: Locale(_selectedValue),
+                      //       style: TextStyle(
+                      //         color: Colors.black,
+                      //         fontSize: screenWidth * 0.042,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // )),
+                    child: Column(
+                      crossAxisAlignment: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.titleLang))
+                          ? CrossAxisAlignment.end   : CrossAxisAlignment.start,
+                      children: [
+                        LanguageContainer(
+                          language: widget.titleLang, // Use the selected language
+                          countryCode: languageCountryCode[widget.titleLang]!['code']!, // Get the country code dynamically
+                          textColor: Colors.black,
+                        ),
+                        SizedBox(height: 9),
+                        Text(
+                          _getTranslation(item, widget.titleLang), // Get translation based on the selected language
+                          textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.titleLang))
+                              ? TextDirection.rtl
+                              : TextDirection.ltr,
+                          softWrap: true,
+                          maxLines: 4,
+                          locale: Locale(_selectedValue),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: screenWidth * 0.042,
+                          ),
+                        ),
+                      ],
+                    ),
+                )),
+                SizedBox(
+                  height: 12,
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                      height: 100,
+                      width: 300,
+                      decoration: BoxDecoration(
+                        color: Color(0XFF4169E1).withValues(alpha: .76),
+                        borderRadius: BorderRadius.circular(12),
+                         boxShadow:[
+                           BoxShadow(
+                             color: Colors.grey.shade400,
+                             offset: Offset(0.2, 1.8),
+                             blurRadius: 0.2,
+                             // spreadRadius: .2,
+                           )
+                         ]
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        // child: Column(
+                        //   crossAxisAlignment: CrossAxisAlignment.stretch,
+                        //   children: [
+                        //     Align(
+                        //       alignment: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.subtitleLang))
+                        //           ? Alignment.topRight // If text is right, buttons move left
+                        //           : Alignment.topLeft,
+                        //       child: Text(
+                        //         _getTranslation(
+                        //             item,
+                        //             widget
+                        //                 .subtitleLang),
+                        //         style: TextStyle(
+                        //           color: Colors.white,
+                        //           fontSize: screenWidth * 0.042,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Spacer(),
+                        //     Align(
+                        //       alignment: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.subtitleLang))
+                        //           ? Alignment.centerLeft // If text is right, buttons move left
+                        //           : Alignment.centerRight,
+                        //       child: Row(
+                        //         mainAxisSize: MainAxisSize.min,
+                        //         mainAxisAlignment: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.subtitleLang))
+                        //             ? MainAxisAlignment.end // RTL languages → Buttons align LEFT
+                        //             : MainAxisAlignment.start,
+                        //         children: [
+                        //           // Copy Icon
+                        //           GestureDetector(
+                        //             onTap: () {
+                        //               final textToCopy = _getTranslation(
+                        //                   item, widget.subtitleLang);
+                        //               _handleIconClick(index, textToCopy, "copy");
+                        //             },
+                        //             child: Image.asset(
+                        //               AppIcons.copyIcon,
+                        //               scale: screenHeight * 0.03,
+                        //               color: isActiveCopy
+                        //                   ? Colors.white
+                        //                   : Colors.black,
+                        //             ),
+                        //           ),
+                        //           SizedBox(width: 10),
+                        //           // Share Icon
+                        //           GestureDetector(
+                        //             onTap: () {
+                        //               final text = _getTranslation(
+                        //                   item, widget.subtitleLang);
+                        //               _handleIconClick(index, text, "share");
+                        //             },
+                        //             child: Image.asset(
+                        //               AppIcons.sharIcon,
+                        //               scale: screenHeight * 0.03,
+                        //               color: isActiveShare
+                        //                   ? Colors.white
+                        //                   : Colors.black,
+                        //             ),
+                        //           ),
+                        //           SizedBox(width: 10),
+                        //           // Volume Icon
+                        //           GestureDetector(
+                        //             onTap: () async {
+                        //               String textToSpeak = _getTranslation(
+                        //                   item, widget.subtitleLang);
+                        //               _handleIconClick(
+                        //                   index, textToSpeak, "volume");
+                        //             },
+                        //             child: Image.asset(
+                        //               AppIcons.volumeIcon,
+                        //               scale: screenHeight * 0.03,
+                        //               color: isActiveVolume
+                        //                   ? Colors.white
+                        //                   : Colors.black,
+                        //             ),
+                        //           ),
+                        //         ],
+                        //       ),
+                        //     )
+                        //   ],
+                        // ),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.subtitleLang))
+                                              ? CrossAxisAlignment.end   : CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              _getTranslation(item, widget.titleLang), // Moved to the first argument
-                              softWrap: true,
-                              maxLines: 4,
-                              locale: Locale(_selectedValue),
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: screenWidth * 0.042,
-                              ),
-                              textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.titleLang))
-                                  ? TextDirection.rtl
-                                  : TextDirection.ltr,
+                            LanguageContainer(
+                              language: widget.subtitleLang, // Use the selected language
+                              countryCode: languageCountryCode[widget.subtitleLang]!['code']!, // Get the country code dynamically
+                              textColor: Colors.white,
                             ),
-
-                            Text(
-                              _getTranslation(item, widget.subtitleLang),
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: Color(0XFF4169E1).withValues(alpha: .76),
-                                fontSize: screenWidth * 0.04,
+                            SizedBox(height: 8),
+                            Flexible(
+                              child: Text(
+                                _getTranslation(item, widget.subtitleLang), // Get translation based on the selected language
+                                textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.titleLang))
+                                    ? TextDirection.rtl
+                                    : TextDirection.ltr,
+                                softWrap: true,
+                                maxLines: 4,
+                                locale: Locale(_selectedValue),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: screenWidth * 0.042,
+                                ),
                               ),
+                            ),
+                            SizedBox(height: 8),
+                             Row(
+                              // mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.subtitleLang))
+                                  ? MainAxisAlignment.start // RTL languages → Buttons align LEFT
+                                  : MainAxisAlignment.end,
+                              children: [
+                                // Copy Icon
+                                GestureDetector(
+                                  onTap: () {
+                                    final textToCopy = _getTranslation(
+                                        item, widget.subtitleLang);
+                                    _handleIconClick(index, textToCopy, "copy");
+                                  },
+                                  child: Image.asset(
+                                    AppIcons.copyIcon,
+                                    scale: screenHeight * 0.035,
+                                    color: isActiveCopy
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
+                                SizedBox(width: 7),
+                                // Share Icon
+                                GestureDetector(
+                                  onTap: () {
+                                    final text = _getTranslation(
+                                        item, widget.subtitleLang);
+                                    _handleIconClick(index, text, "share");
+                                  },
+                                  child: Image.asset(
+                                    AppIcons.sharIcon,
+                                    scale: screenHeight * 0.035,
+                                    color: isActiveShare
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
+                                SizedBox(width: 7),
+                                // Volume Icon
+                                GestureDetector(
+                                  onTap: () async {
+                                    String textToSpeak = _getTranslation(
+                                        item, widget.subtitleLang);
+                                    _handleIconClick(
+                                        index, textToSpeak, "volume");
+                                  },
+                                  child: Image.asset(
+                                    AppIcons.volumeIcon,
+                                    scale: screenHeight * 0.035,
+                                    color: isActiveVolume
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // Copy Icon
-                      GestureDetector(
-                        onTap: () {
-                          final textToCopy =
-                          _getTranslation(item, widget.subtitleLang);
-                          _handleIconClick(index, textToCopy, "copy");
-                        },
-                        child: CircleAvatar(
-                          radius: 19,
-                          backgroundColor: Color(0XFFaeaeae).withAlpha(26),
-                          child: Image.asset(
-                            AppIcons.copyIcon,
-                            scale: screenHeight * 0.03,
-                            color: isActiveCopy ? Colors.blue : Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      // Share Icon
-                      GestureDetector(
-                        onTap: () {
-                          final text = _getTranslation(item, widget.subtitleLang);
-                          _handleIconClick(index, text, "share");
-                        },
-                        child: CircleAvatar(
-                          radius: 19,
-                          backgroundColor: Color(0XFFaeaeae).withAlpha(26),
-                          child: Image.asset(
-                            AppIcons.sharIcon,
-                            scale: screenHeight * 0.03,
-                            color: isActiveShare ? Colors.blue :  Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      // Volume Icon
-                      GestureDetector(
-                        onTap: () async {
-                          String textToSpeak =
-                          _getTranslation(item, widget.subtitleLang);
-                          _handleIconClick(index, textToSpeak, "volume");
-                        },
-                        child: CircleAvatar(
-                          radius: 19,
-                          backgroundColor: Color(0XFFaeaeae).withAlpha(26),
-                          child: Image.asset(
-                            AppIcons.volumeIcon,
-                            scale: screenHeight * 0.03,
-                            color: isActiveVolume ? Colors.blue :  Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            );
-          },
-        );
+                      )),
+                ),
+                // SizedBox(
+                //   height: 12,
+                // ),
+                // translated text container
+              ],
+            ),
+          );
+        });
+
+        // return ListView.builder(
+        //   itemCount: filterPhraseID.length,
+        //   itemBuilder: (context, index) {
+        //     final item = filterPhraseID[index];
+        //     final isActiveCopy   = activeIcons[index] == "copy";
+        //     final isActiveShare  = activeIcons[index] == "share";
+        //     final isActiveVolume = activeIcons[index] == "volume";
+        //     return Container(
+        //       padding: EdgeInsets.symmetric(
+        //         horizontal: screenWidth * 0.04,
+        //         vertical: screenHeight * 0.01,
+        //       ),
+        //       margin: EdgeInsets.symmetric(
+        //         horizontal: screenWidth * 0.02,
+        //         vertical: screenHeight * 0.01,
+        //       ),
+        //       width: screenWidth * 0.9,
+        //       height: screenHeight * 0.17,
+        //       decoration: BoxDecoration(
+        //         color: Colors.grey[300],
+        //         borderRadius: BorderRadius.circular(screenWidth * 0.066),
+        //         // border: Border(
+        //         //     // bottom: BorderSide(color: Color(0XFF22223B).withValues(alpha: .2), width: 2),
+        //         //     top: BorderSide(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2),
+        //         //     left: BorderSide(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2),
+        //         //     right: BorderSide(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2),
+        //         // ),
+        //         // color: Color(0XFF4169E1).withValues(alpha: .03),
+        //         border: Border.all(color: Color(0XFF4169E1).withValues(alpha: .2), width: 2)
+        //
+        //       ),
+        //       child: Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           Row(
+        //             mainAxisAlignment: MainAxisAlignment.start,
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             children: [
+        //               Flexible(
+        //                 child: Column(
+        //                   mainAxisAlignment: MainAxisAlignment.start,
+        //                   crossAxisAlignment: CrossAxisAlignment.start,
+        //                   children: [
+        //                     Text(
+        //                       _getTranslation(item, widget.titleLang), // Moved to the first argument
+        //                       softWrap: true,
+        //                       maxLines: 4,
+        //                       locale: Locale(_selectedValue),
+        //                       style: TextStyle(
+        //                         color: Colors.black,
+        //                         fontSize: screenWidth * 0.042,
+        //                       ),
+        //                       textDirection: (["Arabic", "Urdu", "Hebrew", "Persian"].contains(widget.titleLang))
+        //                           ? TextDirection.rtl
+        //                           : TextDirection.ltr,
+        //                     ),
+        //
+        //                     Text(
+        //                       _getTranslation(item, widget.subtitleLang),
+        //                       textAlign: TextAlign.left,
+        //                       style: TextStyle(
+        //                         color: Color(0XFF4169E1).withValues(alpha: .76),
+        //                         fontSize: screenWidth * 0.04,
+        //                       ),
+        //                     ),
+        //                   ],
+        //                 ),
+        //               ),
+        //             ],
+        //           ),
+        //           Spacer(),
+        //           Row(
+        //             mainAxisAlignment: MainAxisAlignment.end,
+        //             children: [
+        //               // Copy Icon
+        //               GestureDetector(
+        //                 onTap: () {
+        //                   final textToCopy =
+        //                   _getTranslation(item, widget.subtitleLang);
+        //                   _handleIconClick(index, textToCopy, "copy");
+        //                 },
+        //                 child: CircleAvatar(
+        //                   radius: 19,
+        //                   backgroundColor: Color(0XFFaeaeae).withAlpha(26),
+        //                   child: Image.asset(
+        //                     AppIcons.copyIcon,
+        //                     scale: screenHeight * 0.03,
+        //                     color: isActiveCopy ? Colors.blue : Colors.black,
+        //                   ),
+        //                 ),
+        //               ),
+        //               SizedBox(width: 10),
+        //               // Share Icon
+        //               GestureDetector(
+        //                 onTap: () {
+        //                   final text = _getTranslation(item, widget.subtitleLang);
+        //                   _handleIconClick(index, text, "share");
+        //                 },
+        //                 child: CircleAvatar(
+        //                   radius: 19,
+        //                   backgroundColor: Color(0XFFaeaeae).withAlpha(26),
+        //                   child: Image.asset(
+        //                     AppIcons.sharIcon,
+        //                     scale: screenHeight * 0.03,
+        //                     color: isActiveShare ? Colors.blue :  Colors.black,
+        //                   ),
+        //                 ),
+        //               ),
+        //               SizedBox(width: 10),
+        //               // Volume Icon
+        //               GestureDetector(
+        //                 onTap: () async {
+        //                   String textToSpeak =
+        //                   _getTranslation(item, widget.subtitleLang);
+        //                   _handleIconClick(index, textToSpeak, "volume");
+        //                 },
+        //                 child: CircleAvatar(
+        //                   radius: 19,
+        //                   backgroundColor: Color(0XFFaeaeae).withAlpha(26),
+        //                   child: Image.asset(
+        //                     AppIcons.volumeIcon,
+        //                     scale: screenHeight * 0.03,
+        //                     color: isActiveVolume ? Colors.blue :  Colors.black,
+        //                   ),
+        //                 ),
+        //               ),
+        //             ],
+        //           )
+        //         ],
+        //       ),
+        //     );
+        //   },
+        // );
       }),
+    );
+  }
+}
+class LanguageContainer extends StatelessWidget {
+  final String language;
+  final String countryCode;
+  final Color textColor;
+
+  const LanguageContainer({
+    required this.language,
+    required this.countryCode,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    // Truncate language if its length exceeds 10 characters
+    String displayLanguage = language.length > 8 ? '${language.substring(0, 8)}...' : language;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      spacing: 6,
+      children: [
+
+        CountryFlag.fromCountryCode(
+          countryCode,
+          height: 20,
+          width: 20,
+          shape: Circle(),
+        ),
+        Text(
+          displayLanguage,
+          style: TextStyle(
+            color: textColor,
+            fontSize: screenWidth * 0.038,
+          ),
+        ),
+
+      ],
     );
   }
 }

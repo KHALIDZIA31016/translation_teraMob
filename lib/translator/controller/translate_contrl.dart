@@ -153,8 +153,6 @@ class MyTranslationController extends GetxController {
     'Yoruba': 'yo',        // Yoruba
     'Zulu': 'zu',          // Zulu
   };
-
-
   final Map<String, String> languageFlags = {
     'English': 'US',       // English (United States)
     'Urdu': 'PK',          // Urdu (Pakistan)

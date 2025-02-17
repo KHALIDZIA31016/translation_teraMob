@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:mnh/testScreen.dart';
 import 'package:mnh/translator/view/my_translate_view.dart';
 import 'package:mnh/views/spell_pronounce/dictionary.dart';
 import 'package:mnh/views/spell_pronounce/services_dict/phras_db/lang_seg.dart';
@@ -40,3 +41,30 @@ class _VoiceAssistanceState extends State<VoiceAssistance> {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
